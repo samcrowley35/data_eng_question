@@ -27,6 +27,7 @@
 
 4. To activate the docker containers that host Localstack and Postgres, run ```docker-compose up -d```
     - To check and see if all is well, run the ```docker ps``` command
+    - be sure to open Docker desktop before this step as well
 
 5. After Localstack and Postgres are spun up, run the python script with the command ```python3 read_queue.py```. Note: for some machines, you may need to use 'python' rather than 'python3'.
     - This script runs infinitely and reads from the local stack every five seconds so be sure to hit CTRL+C to end it.
