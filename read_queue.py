@@ -4,6 +4,7 @@ import xmltodict
 import json
 import time
 import psycopg2
+import sys
 from datetime import datetime, timezone
 from cryptography.fernet import Fernet
 
@@ -73,35 +74,39 @@ def insert_data(data:dict):
             conn.close()
 
 def main():
-    while(True): 
-        # Read the messages from the sqs queue
-        response = requests.get(
-            url= "http://localhost:4566/000000000000/login-queue?Action=ReceiveMessage",
-            headers={ 'Accept' : 'application/json' }
-        )
-        xml_dict = xmltodict.parse(response.content)
-        login_data = xml_dict['ReceiveMessageResponse']['ReceiveMessageResult']['Message']['Body']
-        login_dict = json.loads(login_data)
+    try: 
+        while(True): 
+            # Read the messages from the sqs queue
+            response = requests.get(
+                url= "http://localhost:4566/000000000000/login-queue?Action=ReceiveMessage",
+                headers={ 'Accept' : 'application/json' }
+            )
+            xml_dict = xmltodict.parse(response.content)
+            login_data = xml_dict['ReceiveMessageResponse']['ReceiveMessageResult']['Message']['Body']
+            login_dict = json.loads(login_data)
 
-        # Mask the device_id and ip fields
-        enc_did, enc_ip = mask_fields(login_dict['device_id'], login_dict['ip'])
+            # Mask the device_id and ip fields
+            enc_did, enc_ip = mask_fields(login_dict['device_id'], login_dict['ip'])
 
-        # Convert the app version to an int
-        app_version_str = str(login_dict['app_version']).replace('.', '')
-        app_version_int = int(app_version_str)
+            # Convert the app version to an int
+            app_version_str = str(login_dict['app_version']).replace('.', '')
+            app_version_int = int(app_version_str)
 
-        # Insert data into postgres table
-        data_to_insert = {
-            'user_id': login_dict['user_id'],
-            'device_type': login_dict['device_type'],
-            'masked_ip': enc_ip,
-            'masked_device_id': enc_did,
-            'locale': login_dict['locale'],
-            'app_version': app_version_int,
-            'create_date': datetime.now(timezone.utc)
-        }
-        insert_data(data_to_insert)
-        time.sleep(5)
+            # Insert data into postgres table
+            data_to_insert = {
+                'user_id': login_dict['user_id'],
+                'device_type': login_dict['device_type'],
+                'masked_ip': enc_ip,
+                'masked_device_id': enc_did,
+                'locale': login_dict['locale'],
+                'app_version': app_version_int,
+                'create_date': datetime.now(timezone.utc)
+            }
+            insert_data(data_to_insert)
+            time.sleep(5)
+    except KeyboardInterrupt:
+        print('Program Terminated.')
+        sys.exit(0)
 
 if __name__ == "__main__":
     main()
