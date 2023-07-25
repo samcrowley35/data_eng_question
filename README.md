@@ -10,6 +10,7 @@
 - How will you mask the PII data so that duplicate values can be identified?
     - In my solution, I used the Fernet module to mask the data.
     - This encryption scheme only uses one key, so if data analysts had access to said key, they could easily decrypt the encrypted/masked fields as well as see duplicate encrypted values to identify users in the Postgres table.
+    - Note: The encrypted versions of the PII data can get pretty long, so the data table may look messed up
 
 - What will be your strategy for connecting and writing to Postgres?
     - To do this, I used the psycopg2 module to connect the the Postgres database hosted within the docker container.

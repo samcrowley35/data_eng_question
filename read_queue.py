@@ -29,7 +29,6 @@ def insert_data(data:dict):
     try:
         cursor.execute("select exists(select * from information_schema.tables where table_name='user_logins')")
         exists = cursor.fetchone()[0]
-        print(exists)
     except psycopg2.Error as e:
         print(e)    
     if not exists:
@@ -65,6 +64,7 @@ def insert_data(data:dict):
         data_to_insert = (data['user_id'], data['device_type'], data['masked_ip'], data['masked_device_id'], data['locale'], data['app_version'], data['create_date'])
         cursor.execute(insert_query, data_to_insert)
         conn.commit()
+        print('Row has been inserted')
     except (Exception, psycopg2.Error) as error:
         print('Insertion to postgres table failed with error: ' + str(error))
     finally:
