@@ -2,7 +2,7 @@
 
 ### Decisions made during development
 - How will you read messages from the queue?
-    - To read the messages from the SQS queue, I used python's request library because it was much more convenient to use compared to the AWS boto3 package.
+    - To read the messages from the SQS queue, I used python's request library because I couldn't figure out how to properly use the AWS boto3 package.
 
 - What type of data structures should be used?
     - In my solution, I simply used python dictionaries to extract the login information, then used the values within it to make a list to insert into the Postgres table.
